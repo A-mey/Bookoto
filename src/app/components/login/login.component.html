@@ -1,0 +1,142 @@
+<!-- <span class="close-icon" (click)="closeModal()"></span> -->
+<!-- <close-icon (click)="closeModal()"></close-icon> -->
+
+<div class="loginForm" *ngIf="showLoginForm">
+    <form class="loginForm" [formGroup]="loginForm" (ngSubmit)="submitLoginForm()" novalidate>
+        
+        <!-- Email -->
+        <div>
+            <div *ngIf="(loginForm.controls['EMAIL'].errors && loginForm.controls['EMAIL'].touched) || loginForm.controls['EMAIL'].dirty">
+                <!-- <small *ngIf="loginForm.controls['EMAIL'].errors?.['required']" class="text-danger">Email is required</small> -->
+                <small *ngIf="loginForm.controls['EMAIL'].errors?.['email']" class="text-danger">Please provide a valid email address</small>
+            </div>
+            <mat-form-field class="example-full-width">
+                <input matInput placeholder="Email" formControlName="EMAIL" />
+            </mat-form-field>
+        </div>
+
+        <!-- Password -->
+        <div>
+            <div *ngIf="(loginForm.controls['PASSWORD'].errors && loginForm.controls['PASSWORD'].touched) || loginForm.controls['PASSWORD'].dirty">
+                <!-- <small *ngIf="loginForm.controls['PASSWORD'].errors?.['required']" class="text-danger">Password is required</small> -->
+            </div>
+            <mat-form-field class="example-full-width">
+                <input matInput type="password" placeholder="Password" formControlName="PASSWORD" />
+            </mat-form-field>
+        </div>
+        
+        <!-- Submit -->
+        <div class="button-wrapper">
+            <button mat-raised-button color="primary">Login</button>
+            <button mat-button (click)="toggleLoginForm('RegistrationForm')">Register</button>
+        </div>
+
+         <!-- Test websocket -->
+         <!-- <div class="button-wrapper">
+            <button mat-raised-button color="primary">Login</button>
+            <button mat-button (click)="testWebsocket()">Test</button>
+        </div> -->
+    </form>
+</div>
+
+<div class="RegistrationForm" *ngIf="!showLoginForm">
+    <form class="RegistrationForm" [formGroup]="registrationForm" (ngSubmit)="submitRegistrationForm()" novalidate>
+
+        <!-- Salutation -->
+        <mat-form-field>
+            <mat-label>Salutation</mat-label>
+            <mat-select formControlName="TITLE">
+                <mat-option value="Mr">Mr</mat-option>
+                <mat-option value="Ms">Ms</mat-option>
+                <mat-option value="Mrs">Mrs</mat-option>
+            </mat-select>
+          </mat-form-field>
+    
+        <!-- First Name -->
+        <div>
+            <div *ngIf="(registrationForm.controls['FIRSTNAME'].errors && registrationForm.controls['FIRSTNAME'].touched) || registrationForm.controls['FIRSTNAME'].dirty">
+                <!-- <small *ngIf="registrationForm.controls['FIRSTNAME'].errors?.['required']" class="text-danger">Your first name is required</small> -->
+                <small *ngIf="registrationForm.controls['FIRSTNAME'].errors?.['pattern']" class="text-danger">Your first name should only contain alphabets</small>
+            </div>
+            <mat-form-field class="example-full-width">
+                <input matInput placeholder="First Name" formControlName="FIRSTNAME" />
+            </mat-form-field>
+        </div>
+        
+        <!-- Last Name-->
+        <div>
+            <div *ngIf="(registrationForm.controls['LASTNAME'].errors && registrationForm.controls['LASTNAME'].touched) || registrationForm.controls['LASTNAME'].dirty">
+                <small *ngIf="registrationForm.controls['LASTNAME'].errors?.['pattern']" class="text-danger">Your last name should only contain alphabets</small>
+            </div>
+            <mat-form-field class="example-full-width">
+                <input matInput placeholder="Last Name" formControlName="LASTNAME" />
+            </mat-form-field>
+        </div>
+
+        <!-- Email -->
+        <div>
+            <div *ngIf="(registrationForm.controls['EMAILID'].errors && registrationForm.controls['EMAILID'].touched) || registrationForm.controls['EMAILID'].dirty">
+                <!-- <small *ngIf="registrationForm.controls['EMAILID'].errors?.['required']" class="text-danger">Email is required</small> -->
+                <small *ngIf="registrationForm.controls['EMAILID'].errors?.['email']" class="text-danger">Please provide a valid email address</small>
+            </div>
+            <mat-form-field class="example-full-width">
+                <input matInput placeholder="Email" formControlName="EMAILID" />
+            </mat-form-field>
+        </div>
+
+        <!-- Password -->
+        <div>
+            <div *ngIf="(registrationForm.controls['PASSWORD'].errors && registrationForm.controls['PASSWORD'].touched) || registrationForm.controls['PASSWORD'].dirty">
+                <!-- <small *ngIf="registrationForm.controls['PASSWORD'].errors?.['required']" class="text-danger">Password is required</small> -->
+                <!-- <small *ngIf="registrationForm.controls['PASSWORD'].errors?.['minLength']" class="text-danger">Please enter atleast 8 characters</small> -->
+                <small *ngIf="registrationForm.controls['PASSWORD'].errors?.['pattern']" class="text-danger">Your password should be atleast 8 characters and contain atleast one uppercase character, one lowercase character, one number and one special character</small>
+            </div>
+            <mat-form-field class="example-full-width">
+                <input type="password" matInput placeholder="Password" formControlName="PASSWORD" />
+            </mat-form-field>
+        </div>
+
+        <!-- Re-enter Password -->
+        <div>
+            <div *ngIf="(registrationForm.controls['PASSWORD2'].errors && registrationForm.controls['PASSWORD2'].touched) || registrationForm.controls['PASSWORD2'].dirty">
+                <!-- <small *ngIf="registrationForm.controls['PASSWORD2'].errors?.['required']" class="text-danger">Email is required</small> -->
+                <small *ngIf="registrationForm.controls['PASSWORD2'].errors?.['email']" class="text-danger">Please provide a valid email address</small>
+            </div>
+            <mat-form-field class="example-full-width">
+                <input type="password" matInput placeholder="Re-enter Password" formControlName="PASSWORD2" />
+            </mat-form-field>
+        </div>
+        
+        <!-- Gender -->
+        <div class="misc-bottom-padding">
+            <mat-label>Gender:</mat-label>
+            <mat-radio-group aria-label="Select an option" formControlName="GENDER">
+            <mat-radio-button value="M">Male</mat-radio-button>
+            <mat-radio-button value="F">Female</mat-radio-button>
+            </mat-radio-group>
+        </div>
+        <!-- Date picker -->
+        <mat-form-field>
+            <div *ngIf="(registrationForm.controls['DOB'].errors && registrationForm.controls['DOB'].touched) || registrationForm.controls['DOB'].dirty">
+                <!-- <small *ngIf="registrationForm.controls['DOB'].errors?.['required']" class="text-danger">DOB is required</small> -->
+            </div>
+            <input
+            [max]="maxDate"
+            matInput
+            readonly
+            [matDatepicker]="picker"
+            placeholder="Date of birth"
+            formControlName="DOB"
+            (dateChange)="date($event.target.value)"
+            />
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+        
+        <!-- Submit -->
+        <div class="button-wrapper">
+            <button mat-raised-button color="primary">Submit</button>
+            <button mat-button (click)="toggleLoginForm('LoginForm')">Login</button>
+        </div>
+    </form>
+</div>
