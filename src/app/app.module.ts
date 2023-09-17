@@ -23,8 +23,14 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatMomentDateModule } from '@angular/material-moment-adapter';
 import { MatInputModule } from '@angular/material/input';
 import {MatSelectModule} from '@angular/material/select';
+import { NgOtpInputModule } from  'ng-otp-input';
+import { NgxOtpInputModule } from 'ngx-otp-input';
+
 
 import { ClickCursorDirective } from './directives/click.cursor.directive';
+import { CustomDisableDirective } from './directives/disable.directive';
+import { CountdownTimerComponent } from './components/countdown-timer/countdown-timer.component';
+import { TimePipe } from './pipes/time.pipe';
 
 
 
@@ -34,7 +40,10 @@ import { ClickCursorDirective } from './directives/click.cursor.directive';
     HomeComponent,
     NavbarComponent,
     LoginComponent,
-    ClickCursorDirective    
+    ClickCursorDirective,
+    CustomDisableDirective,
+    CountdownTimerComponent,
+    TimePipe    
   ],
   imports: [
     BrowserModule,
@@ -54,7 +63,9 @@ import { ClickCursorDirective } from './directives/click.cursor.directive';
     MatDatepickerModule,
     MatMomentDateModule,
     MatInputModule,
-    MatSelectModule
+    MatSelectModule,
+    NgOtpInputModule,
+    NgxOtpInputModule
   ],
   providers: [DataService],
   bootstrap: [AppComponent]

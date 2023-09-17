@@ -1,8 +1,8 @@
 <!-- <span class="close-icon" (click)="closeModal()"></span> -->
 <!-- <close-icon (click)="closeModal()"></close-icon> -->
 
-<div class="loginForm" *ngIf="showLoginForm">
-    <form class="loginForm" [formGroup]="loginForm" (ngSubmit)="submitLoginForm()" novalidate>
+<div class="loginForm" *ngIf="formType === 1">
+    <form class="loginForm" [formGroup]="loginForm" (ngSubmit)="submitLoginForm()">
         
         <!-- Email -->
         <div>
@@ -28,27 +28,75 @@
         <!-- Submit -->
         <div class="button-wrapper">
             <button mat-raised-button color="primary">Login</button>
-            <button mat-button (click)="toggleLoginForm('RegistrationForm')">Register</button>
+            <button mat-button (click)="toggleLoginForm()">Register</button>
         </div>
 
-         <!-- Test websocket -->
-         <!-- <div class="button-wrapper">
-            <button mat-raised-button color="primary">Login</button>
-            <button mat-button (click)="testWebsocket()">Test</button>
-        </div> -->
     </form>
 </div>
 
-<div class="RegistrationForm" *ngIf="!showLoginForm">
-    <form class="RegistrationForm" [formGroup]="registrationForm" (ngSubmit)="submitRegistrationForm()" novalidate>
+<div class="OtpForm" *ngIf="formType === 2">
+    <form [formGroup]="otpForm" (ngSubmit)="sendOtp()">
+        
+        <!-- Email -->
+        <div>
+            <div *ngIf="(otpForm.controls['EMAIL'].errors && otpForm.controls['EMAIL'].touched) || otpForm.controls['EMAIL'].dirty">
+                <!-- <small *ngIf="loginForm.controls['EMAIL'].errors?.['required']" class="text-danger">Email is required</small> -->
+                <small *ngIf="otpForm.controls['EMAIL'].errors?.['pattern']" class="text-danger">Please provide a valid email address</small>
+            </div>
+            <mat-form-field class="example-full-width">
+                <input matInput placeholder="Email" formControlName="EMAIL" />
+            </mat-form-field>
+        </div>
+        
+        <!-- Submit -->
+        <div class="button-wrapper">
+            <button mat-raised-button color="primary">Verify Email</button>
+        </div>
+
+    </form>
+</div>
+
+<div class ="OtpVerificationForm" *ngIf="formType === 3">
+
+    <form class="otpVerificationForm" [formGroup]="otpVerificationForm" (ngSubmit)="validateOtp()">
+
+        <!-- Email -->
+        <div>
+            <mat-form-field class="example-full-width">
+                <input [appCustomDisable]="formType === 3" matInput placeholder="Email" formControlName="EMAIL" />
+            </mat-form-field>
+        </div>
+
+        <!-- otp -->
+        <div>
+            <!-- <ngx-otp-input [config]="otpInputConfig" formControlName="OTP"></ngx-otp-input> -->
+            <ngx-otp-input [config]="otpInputConfig" (otpChange)="handeOtpChange($event)" (fill)="handleFillEvent($event)">
+            </ngx-otp-input>
+            
+        </div>
+    
+        <div class="button-wrapper">    
+            <button [disabled]="otpSeconds <= 0" mat-raised-button color="primary">Verify OTP</button>
+        </div>
+
+        <!-- <app-countdown-timer [seconds]=""></app-countdown-timer> -->
+        <div>{{ timer$ | async | time}}</div>
+        <div (click)="sendOtp()">Resend OTP</div>
+        <div (click)="formType = formType - 1">Use a different email id</div>
+    </form>
+
+</div>
+
+<div class="RegistrationForm" *ngIf="formType === 4">
+    <form class="RegistrationForm" [formGroup]="registrationForm" (ngSubmit)="submitRegistrationForm()">
 
         <!-- Salutation -->
         <mat-form-field>
             <mat-label>Salutation</mat-label>
             <mat-select formControlName="TITLE">
-                <mat-option value="Mr">Mr</mat-option>
-                <mat-option value="Ms">Ms</mat-option>
-                <mat-option value="Mrs">Mrs</mat-option>
+                <mat-option value="1">Mr</mat-option>
+                <mat-option value="2">Ms</mat-option>
+                <mat-option value="3">Mrs</mat-option>
             </mat-select>
           </mat-form-field>
     
@@ -77,7 +125,7 @@
         <div>
             <div *ngIf="(registrationForm.controls['EMAILID'].errors && registrationForm.controls['EMAILID'].touched) || registrationForm.controls['EMAILID'].dirty">
                 <!-- <small *ngIf="registrationForm.controls['EMAILID'].errors?.['required']" class="text-danger">Email is required</small> -->
-                <small *ngIf="registrationForm.controls['EMAILID'].errors?.['email']" class="text-danger">Please provide a valid email address</small>
+                <small *ngIf="registrationForm.controls['EMAILID'].errors?.['pattern']" class="text-danger">Please provide a valid email address</small>
             </div>
             <mat-form-field class="example-full-width">
                 <input matInput placeholder="Email" formControlName="EMAILID" />
@@ -111,8 +159,8 @@
         <div class="misc-bottom-padding">
             <mat-label>Gender:</mat-label>
             <mat-radio-group aria-label="Select an option" formControlName="GENDER">
-            <mat-radio-button value="M">Male</mat-radio-button>
-            <mat-radio-button value="F">Female</mat-radio-button>
+            <mat-radio-button value="1">Male</mat-radio-button>
+            <mat-radio-button value="2">Female</mat-radio-button>
             </mat-radio-group>
         </div>
         <!-- Date picker -->
@@ -136,7 +184,7 @@
         <!-- Submit -->
         <div class="button-wrapper">
             <button mat-raised-button color="primary">Submit</button>
-            <button mat-button (click)="toggleLoginForm('LoginForm')">Login</button>
+            <button mat-button (click)="toggleLoginForm()">Login</button>
         </div>
     </form>
 </div>
