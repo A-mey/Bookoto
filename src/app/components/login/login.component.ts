@@ -5,6 +5,9 @@ import { ConfirmPasswordValidator } from 'src/app/common/confirm-password';
 import { LoginForm } from 'src/app/enums/login.enum';
 import { NgxOtpInputConfig } from 'ngx-otp-input';
 import { Observable, scan, takeWhile, timer } from 'rxjs';
+import {response} from './../../types/response.types';
+import { CookieServices } from 'src/app/services/cookie.service';
+import { fullHash } from 'src/app/types/fullHash.type';
 // import { map, timer, takeWhile } from 'rxjs';
 
 @Component({
@@ -43,6 +46,8 @@ export class LoginComponent {
 
 
   @Output() closeModalEvent = new EventEmitter<void>();
+  allowedMinAge: number = 13;
+  fullHash!: string;
   
 
   ngOnInit(): void {
@@ -81,15 +86,58 @@ export class LoginComponent {
 
     const currentDate = new Date();
     // this.minDate = new Date(currentYear - 13, 0, 1);
-    this.maxDate = new Date(currentDate.setFullYear(currentDate.getFullYear() - 13));
+    this.maxDate = new Date(currentDate.setFullYear(currentDate.getFullYear() - this.allowedMinAge));
 
-    this.socketService.getNewMessage().subscribe((data) => {
+    // this.socketService.getNewMessage().subscribe(async(data) => {
+    //   console.log(data);
+    //   const responseData =  data as unknown as response;
+    //   if (responseData.success) {
+    //     //for registration success
+    //     this.formType = 1;
+    //     //for login success
+    //     await this.login(responseData);
+    //   }
+    // });
+    // this.socketService.getRegistrationResponse().subscribe(async(data) => {
+    //   console.log(data);
+    //   const responseData =  data as unknown as response;
+    //   if (responseData.success) {
+    //     //for registration success
+    //     this.formType = 1;
+    //     //for login success
+    //     // await this.login(responseData);
+    //   }
+    // });
+    this.socketService.getRegistrationResponse().subscribe(async(data: unknown) => {
       console.log(data);
+      const responseData =  data as unknown as response;
+      if (responseData.success) {
+        this.formType = 1;
+      }
     });
 
-  }
+    this.socketService.getSendOtpResponse().subscribe(async(data: unknown) => {
+      console.log(data);
+      const responseData =  data as unknown as response;
+      if (responseData.success) {
+        const hashData: fullHash = responseData.data.data as unknown as fullHash;
+        this.fullHash = hashData.fullHash;
+        this.formType++;
+      }
+    });
 
-  constructor(public fb: FormBuilder, private socketService: SocketService) {}
+    this.socketService.getVerifyOtpResponse().subscribe(async(data: unknown) => {
+      console.log(data);
+      const responseData =  data as unknown as response;
+      if (responseData.success) {
+        this.formType = 1;
+      }
+    });
+  }
+  constructor(
+    public fb: FormBuilder,
+    private socketService: SocketService,
+    private cookieServices: CookieServices) {}
 
   submitRegistrationForm() {
     console.log(this.registrationForm.value);
@@ -182,8 +230,14 @@ export class LoginComponent {
     // console.log(value);
     this.otpVerificationForm.patchValue({
       OTP: value
-  });
+    });
   }
+
+  login = async (data: response) => {
+    this.cookieServices.setCookie('userData', JSON.stringify(data.data.data));
+    // this.closeModal();
+    window.location.reload();
+  };
 
   
   
