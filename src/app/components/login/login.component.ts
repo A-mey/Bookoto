@@ -4,10 +4,13 @@ import { SocketService } from 'src/app/services/socket.service';
 import { ConfirmPasswordValidator } from 'src/app/common/confirm-password';
 import { LoginForm } from 'src/app/enums/login.enum';
 import { NgxOtpInputConfig } from 'ngx-otp-input';
-import { Observable, scan, takeWhile, timer } from 'rxjs';
+import { Observable, Subscription, scan, takeWhile, timer } from 'rxjs';
 import {response} from './../../types/response.types';
 import { CookieServices } from 'src/app/services/cookie.service';
 import { fullHash } from 'src/app/types/fullHash.type';
+import { Router } from '@angular/router';
+import { LoginService } from '../../services/login.service';
+import { user } from 'src/app/types/user.type';
 // import { map, timer, takeWhile } from 'rxjs';
 
 @Component({
@@ -20,9 +23,10 @@ export class LoginComponent {
   seconds!: number;
   emailIdOtp!: string;
   registrationForm!: FormGroup;
-  loginForm!: FormGroup;
-  otpForm!: FormGroup<{ EMAIL: FormControl<string | null>; }>;
-  otpVerificationForm!: FormGroup<{ EMAIL: FormControl<string | null>; OTP: FormControl<string | null>; }>;
+  // registrationForm!: FormGroup<{TITLE<string | null>; FIRSTNAME<string | null>; LASTNAME<string | null>; EMAILID<string | null>; GENDER<string | null>; DOB<string | null>; PASSWORD<string | null>; PASSWORD2<string | null>}>;
+  loginForm!: FormGroup<{ EMAILID: FormControl<string | null>; PASSWORD: FormControl<string | null>; }>;
+  otpForm!: FormGroup<{ EMAILID: FormControl<string | null>; }>;
+  otpVerificationForm!: FormGroup<{ EMAILID: FormControl<string | null>; OTP: FormControl<string | null>; HASH: FormControl<string | null> }>;
 
   formType: number = LoginForm.Login;
   maxDate!: Date;
@@ -46,13 +50,19 @@ export class LoginComponent {
 
 
   @Output() closeModalEvent = new EventEmitter<void>();
+  @Output() loginUserEvent = new EventEmitter<void>();
+
   allowedMinAge: number = 13;
-  fullHash!: string;
-  
+  fullHash!: string;  
+  registrationResponse!: Subscription;
+  sendOtpResponse!: Subscription;
+  verifyOtpResponse!: Subscription;
+  loginResponse!: Subscription;
 
   ngOnInit(): void {
     this.otpSeconds = 120;
-    const passwordRegex: RegExp = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$/i;
+    const passwordRegex: RegExp = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/i;
+    // const passwordRegex: RegExp = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$/i;
     const emailRegex: RegExp = /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/i;
     const alphabet: RegExp = /^[a-zA-Z]+$/i;
     this.registrationForm = this.fb.group({
@@ -60,7 +70,7 @@ export class LoginComponent {
       FIRSTNAME: ['', [Validators.required, Validators.pattern(alphabet)]],
       LASTNAME: ['', Validators.pattern(alphabet)],
       EMAILID: [{value: '', disabled: true}, [Validators.required, Validators.pattern(emailRegex)]],
-      GENDER: ['M'],
+      GENDER: ['1'],
       DOB: [''],
       PASSWORD: ['', [Validators.required, Validators.minLength(8), Validators.pattern(passwordRegex)]],
       PASSWORD2: ['', [Validators.required, Validators.minLength(8), Validators.pattern(passwordRegex)]],
@@ -70,18 +80,19 @@ export class LoginComponent {
     });
 
     this.loginForm = this.fb.group({
-      EMAIL: ['', [Validators.required, Validators.pattern(emailRegex)]],
+      EMAILID: ['', [Validators.required, Validators.pattern(emailRegex)]],
       PASSWORD: ['', [Validators.required, Validators.minLength(8), Validators.pattern(passwordRegex)]]
     });
 
     this.otpForm = this.fb.group({
-      EMAIL: ['', [Validators.required, Validators.pattern(emailRegex)]],
+      EMAILID: ['', [Validators.required, Validators.pattern(emailRegex)]],
       
     });
 
     this.otpVerificationForm = this.fb.group({
-      EMAIL: [{value: '', disabled: true}, [Validators.required, Validators.pattern(emailRegex)]],
-      OTP: ['', [Validators.required, Validators.minLength(6)]]
+      EMAILID: [{value: '', disabled: true}, [Validators.required, Validators.pattern(emailRegex)]],
+      OTP: ['', [Validators.required, Validators.minLength(6)]],
+      HASH: ['', [Validators.required]]
     });
 
     const currentDate = new Date();
@@ -108,7 +119,7 @@ export class LoginComponent {
     //     // await this.login(responseData);
     //   }
     // });
-    this.socketService.getRegistrationResponse().subscribe(async(data: unknown) => {
+    this.registrationResponse = this.socketService.getRegistrationResponse().subscribe(async(data: unknown) => {
       console.log(data);
       const responseData =  data as unknown as response;
       if (responseData.success) {
@@ -116,31 +127,53 @@ export class LoginComponent {
       }
     });
 
-    this.socketService.getSendOtpResponse().subscribe(async(data: unknown) => {
+    this.sendOtpResponse = this.socketService.getSendOtpResponse().subscribe(async(data: unknown) => {
       console.log(data);
       const responseData =  data as unknown as response;
       if (responseData.success) {
-        const hashData: fullHash = responseData.data.data as unknown as fullHash;
-        this.fullHash = hashData.fullHash;
-        this.formType++;
+        await this.openValidateOtpForm(responseData);
       }
     });
 
-    this.socketService.getVerifyOtpResponse().subscribe(async(data: unknown) => {
+    this.verifyOtpResponse = this.socketService.getVerifyOtpResponse().subscribe(async(data: unknown) => {
       console.log(data);
       const responseData =  data as unknown as response;
       if (responseData.success) {
-        this.formType = 1;
+        this.openRegistrationForm();
+      }
+    });
+
+    this.loginResponse = this.socketService.getLoginResponse().subscribe(async (data) => {
+      console.log(data);
+      const userData = data as unknown as response;
+      if (userData.success) {
+        this.loginUser(userData);
       }
     });
   }
+
+  ngOnDestroy() {
+    this.registrationResponse.unsubscribe();
+    this.verifyOtpResponse.unsubscribe();
+    this.sendOtpResponse.unsubscribe();
+    this.loginResponse.unsubscribe();
+  }
+
   constructor(
     public fb: FormBuilder,
     private socketService: SocketService,
-    private cookieServices: CookieServices) {}
+    private cookieServices: CookieServices,
+    private router: Router,
+    private loginservice: LoginService) {
+      this.router.routeReuseStrategy.shouldReuseRoute = () => {
+        return false;
+      };
+    }
 
   submitRegistrationForm() {
     console.log(this.registrationForm.value);
+    this.registrationForm.get('GENDER')?.setValue(parseInt(this.registrationForm.value.GENDER));
+    this.registrationForm.get('TITLE')?.setValue(parseInt(this.registrationForm.value.TITLE));
     if (this.registrationForm.valid) {
       this.socketService.sendMessage('EventRegistration', this.registrationForm.getRawValue());
     }
@@ -162,28 +195,29 @@ export class LoginComponent {
   }
 
   toggleLoginForm() {
-    this.formType = this.formType === 1 ? 2 : this.formType === 4? 1 : 1;
+    this.formType++;
   }
 
   closeModal() {
     this.closeModalEvent.emit();
   }
 
-  testWebsocket() {
-    this.socketService.sendMessage('test', 'message');
+  loginUser(data: response) {
+    // this.cookieServices.setCookie('userData', JSON.stringify(userData.data.data));
+    const userData = data.data.data as unknown as user;
+    this.loginservice.loginUser(userData);
+    this.closeModal();
+    // this.loginUserEvent.emit();
   }
 
+  // testWebsocket() {
+  //   this.socketService.sendMessage('test', 'message');
+  // }
+
   sendOtp() {
-    const otpSeconds = 120;
-    // this.emailIdOtp = this.otpForm.value.EMAIL!;
-    this.startTimer(otpSeconds);
     if (this.otpForm.valid) {
-      this.formType++;
+      this.socketService.sendMessage('EventSendOTP', this.otpForm.value);
     }
-    // this.otpVerificationForm.value.EMAIL = this.otpForm.value.EMAIL;
-    this.otpVerificationForm.patchValue({
-        EMAIL: this.otpForm.value.EMAIL
-    });
   }
 
   validateOtp() {
@@ -191,12 +225,7 @@ export class LoginComponent {
     if (this.otpVerificationForm.valid) {
       // this.otpVerificationForm!.get('OTP')!.value;
       console.log(this.otpVerificationForm.getRawValue());
-      this.formType++;
-      console.log(this.otpVerificationForm.getRawValue().EMAIL);
-      const emailId = this.otpVerificationForm.getRawValue().EMAIL;
-      this.registrationForm.patchValue({
-        EMAILID: emailId
-    });
+      this.socketService.sendMessage('EventValidateOTP', this.otpVerificationForm.getRawValue());
     }
   }
 
@@ -233,12 +262,29 @@ export class LoginComponent {
     });
   }
 
-  login = async (data: response) => {
-    this.cookieServices.setCookie('userData', JSON.stringify(data.data.data));
-    // this.closeModal();
-    window.location.reload();
+  // login = async (data: response) => {
+  //   this.cookieServices.setCookie('userData', JSON.stringify(data.data.data));
+  //   // this.closeModal();
+  //   window.location.reload();
+  // };
+
+  openValidateOtpForm = async (responseData: response) => {
+    const hashData: fullHash = responseData.data.data as unknown as fullHash;
+    this.formType++;
+    const otpSeconds = 120;
+    this.startTimer(otpSeconds);
+    this.otpVerificationForm.patchValue({
+        EMAILID: this.otpForm.value.EMAILID,
+        HASH: hashData.fullHash
+    });
   };
 
-  
-  
+  openRegistrationForm = async () => {
+    this.formType++;
+    console.log(this.otpVerificationForm.getRawValue().EMAILID);
+    const emailId = this.otpVerificationForm.getRawValue().EMAILID;
+    this.registrationForm.patchValue({
+      EMAILID: emailId
+    });
+  };
 }

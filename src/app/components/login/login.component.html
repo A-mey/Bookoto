@@ -1,17 +1,17 @@
 <!-- <span class="close-icon" (click)="closeModal()"></span> -->
-<!-- <close-icon (click)="closeModal()"></close-icon> -->
+<close-icon (click)="closeModal()"></close-icon>
 
 <div class="loginForm" *ngIf="formType === 1">
     <form class="loginForm" [formGroup]="loginForm" (ngSubmit)="submitLoginForm()">
         
         <!-- Email -->
         <div>
-            <div *ngIf="(loginForm.controls['EMAIL'].errors && loginForm.controls['EMAIL'].touched) || loginForm.controls['EMAIL'].dirty">
-                <!-- <small *ngIf="loginForm.controls['EMAIL'].errors?.['required']" class="text-danger">Email is required</small> -->
-                <small *ngIf="loginForm.controls['EMAIL'].errors?.['email']" class="text-danger">Please provide a valid email address</small>
+            <div *ngIf="(loginForm.controls['EMAILID'].errors && loginForm.controls['EMAILID'].touched) || loginForm.controls['EMAILID'].dirty">
+                <!-- <small *ngIf="loginForm.controls['EMAILID'].errors?.['required']" class="text-danger">Email is required</small> -->
+                <small *ngIf="loginForm.controls['EMAILID'].errors?.['email']" class="text-danger">Please provide a valid email address</small>
             </div>
             <mat-form-field class="example-full-width">
-                <input matInput placeholder="Email" formControlName="EMAIL" />
+                <input matInput placeholder="Email" formControlName="EMAILID" />
             </mat-form-field>
         </div>
 
@@ -39,12 +39,12 @@
         
         <!-- Email -->
         <div>
-            <div *ngIf="(otpForm.controls['EMAIL'].errors && otpForm.controls['EMAIL'].touched) || otpForm.controls['EMAIL'].dirty">
-                <!-- <small *ngIf="loginForm.controls['EMAIL'].errors?.['required']" class="text-danger">Email is required</small> -->
-                <small *ngIf="otpForm.controls['EMAIL'].errors?.['pattern']" class="text-danger">Please provide a valid email address</small>
+            <div *ngIf="(otpForm.controls['EMAILID'].errors && otpForm.controls['EMAILID'].touched) || otpForm.controls['EMAILID'].dirty">
+                <!-- <small *ngIf="loginForm.controls['EMAILID'].errors?.['required']" class="text-danger">Email is required</small> -->
+                <small *ngIf="otpForm.controls['EMAILID'].errors?.['pattern']" class="text-danger">Please provide a valid email address</small>
             </div>
             <mat-form-field class="example-full-width">
-                <input matInput placeholder="Email" formControlName="EMAIL" />
+                <input matInput placeholder="Email" formControlName="EMAILID" />
             </mat-form-field>
         </div>
         
@@ -63,7 +63,7 @@
         <!-- Email -->
         <div>
             <mat-form-field class="example-full-width">
-                <input [appCustomDisable]="formType === 3" matInput placeholder="Email" formControlName="EMAIL" />
+                <input [appCustomDisable]="formType === 3" matInput placeholder="Email" formControlName="EMAILID" />
             </mat-form-field>
         </div>
 

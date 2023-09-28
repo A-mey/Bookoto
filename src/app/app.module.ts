@@ -11,7 +11,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatIconModule} from '@angular/material/icon';
 import {MatCardModule} from '@angular/material/card';
-import {MatButtonModule} from '@angular/material/button';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { DataService } from './services/data.service';
 import { LoginComponent } from './components/login/login.component';
@@ -25,7 +24,8 @@ import { MatInputModule } from '@angular/material/input';
 import {MatSelectModule} from '@angular/material/select';
 import { NgOtpInputModule } from  'ng-otp-input';
 import { NgxOtpInputModule } from 'ngx-otp-input';
-
+import {MatMenuModule} from '@angular/material/menu';
+import {MatButtonModule} from '@angular/material/button';
 
 import { ClickCursorDirective } from './directives/click.cursor.directive';
 import { CustomDisableDirective } from './directives/disable.directive';
@@ -65,7 +65,8 @@ import { TimePipe } from './pipes/time.pipe';
     MatInputModule,
     MatSelectModule,
     NgOtpInputModule,
-    NgxOtpInputModule
+    NgxOtpInputModule,
+    MatMenuModule
   ],
   providers: [DataService],
   bootstrap: [AppComponent]

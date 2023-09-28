@@ -1,8 +1,8 @@
 export enum events {
-	'disconnect',
-	'connect_error',
-    'EventLoginRes',
-	'EventSendOTPRes',
-	'EventValidateOTPRes',
-	'EventRegistrationRes'
+	'disconnect' = 'disconnectRes',
+	'connect_error' = 'connect_errorRes',
+	'EventLogin' = 'EventLoginRes',
+	'EventSendOTP' = 'EventSendOTPRes',
+	'EventValidateOTP' = 'EventValidateOTPRes',
+	'EventRegistration' = 'EventRegistrationRes'
 }

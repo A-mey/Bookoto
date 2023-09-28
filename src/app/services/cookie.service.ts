@@ -13,5 +13,11 @@ export class CookieServices {
     this.cookieService.set(key, value);
   };
 
+  getCookie = async(key: string): Promise<string> => {
+    return this.cookieService.get(key);
+  };
 
+  deleteCookie = async(key: string): Promise<void> => {
+    this.cookieService.delete(key);
+  };
 }

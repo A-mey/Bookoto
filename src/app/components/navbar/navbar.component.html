@@ -1,6 +1,11 @@
 <div class="navbar">
     <div class="navbar__elements">
         <span class="navbar__elements--right">Home</span>
-        <span class="navbar__elements--right" (click)="openLoginForm()">Login</span>
+        <span *ngIf="!loginState" class="navbar__elements--right" (click)="openLoginForm()">Login</span>
+        <span *ngIf="loginState" class="navbar__elements--right" [matMenuTriggerFor]="menu">{{userName}}</span>        
     </div>
+    <mat-menu #menu="matMenu">
+        <!-- <button mat-menu-item></button> -->
+        <button mat-menu-item (click)="logout()">Logout</button>
+    </mat-menu>
 </div>
