@@ -1,4 +1,5 @@
 <!-- <span class="close-icon" (click)="closeModal()"></span> -->
+<span class="previous" *ngIf="formType !== 1" (click)="openPreviousForm()">&laquo;</span>
 <close-icon (click)="closeModal()"></close-icon>
 
 <div class="loginForm" *ngIf="formType === 1">
@@ -24,6 +25,8 @@
                 <input matInput type="password" placeholder="Password" formControlName="PASSWORD" />
             </mat-form-field>
         </div>
+
+        <div *ngIf="submissionErrorMsg">{{submissionErrorMsg}}</div>
         
         <!-- Submit -->
         <div class="button-wrapper">
@@ -47,6 +50,8 @@
                 <input matInput placeholder="Email" formControlName="EMAILID" />
             </mat-form-field>
         </div>
+
+        <div *ngIf="submissionErrorMsg">{{submissionErrorMsg}}</div>
         
         <!-- Submit -->
         <div class="button-wrapper">
@@ -78,6 +83,8 @@
         <div class="button-wrapper">    
             <button [disabled]="otpSeconds <= 0" mat-raised-button color="primary">Verify OTP</button>
         </div>
+
+        <div *ngIf="submissionErrorMsg">{{submissionErrorMsg}}</div>
 
         <!-- <app-countdown-timer [seconds]=""></app-countdown-timer> -->
         <div>{{ timer$ | async | time}}</div>

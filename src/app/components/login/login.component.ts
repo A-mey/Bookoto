@@ -35,7 +35,6 @@ export class LoginComponent {
 
   otpInputConfig: NgxOtpInputConfig = {
     otpLength: 6,
-    // pattern: /^[a-zA-Z0-9]{6,}$/,
     autofocus: true,
     classList: {
       inputBox: 'my-super-box-class',
@@ -58,9 +57,22 @@ export class LoginComponent {
   sendOtpResponse!: Subscription;
   verifyOtpResponse!: Subscription;
   loginResponse!: Subscription;
+  submissionErrorMsg: string = '';
+
+  public submissionErrorMsgString$ = Observable.create((observer: { next: (arg0: number) => void; }) => {
+    observer.next(this.formType);
+  });
+
+  // public submissionErrorMsgString$ = new Subject();
 
   ngOnInit(): void {
+
+    this.submissionErrorMsgString$.subscribe(() => {
+      this.submissionErrorMsg = '';
+    });
+
     this.otpSeconds = 120;
+
     const passwordRegex: RegExp = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/i;
     // const passwordRegex: RegExp = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$/i;
     const emailRegex: RegExp = /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/i;
@@ -96,34 +108,16 @@ export class LoginComponent {
     });
 
     const currentDate = new Date();
-    // this.minDate = new Date(currentYear - 13, 0, 1);
     this.maxDate = new Date(currentDate.setFullYear(currentDate.getFullYear() - this.allowedMinAge));
 
-    // this.socketService.getNewMessage().subscribe(async(data) => {
-    //   console.log(data);
-    //   const responseData =  data as unknown as response;
-    //   if (responseData.success) {
-    //     //for registration success
-    //     this.formType = 1;
-    //     //for login success
-    //     await this.login(responseData);
-    //   }
-    // });
-    // this.socketService.getRegistrationResponse().subscribe(async(data) => {
-    //   console.log(data);
-    //   const responseData =  data as unknown as response;
-    //   if (responseData.success) {
-    //     //for registration success
-    //     this.formType = 1;
-    //     //for login success
-    //     // await this.login(responseData);
-    //   }
-    // });
     this.registrationResponse = this.socketService.getRegistrationResponse().subscribe(async(data: unknown) => {
       console.log(data);
       const responseData =  data as unknown as response;
       if (responseData.success) {
         this.formType = 1;
+      }
+      else {
+        this.submissionErrorMsg = responseData.data.message;
       }
     });
 
@@ -133,6 +127,9 @@ export class LoginComponent {
       if (responseData.success) {
         await this.openValidateOtpForm(responseData);
       }
+      else {
+        this.submissionErrorMsg = responseData.data.message;
+      }
     });
 
     this.verifyOtpResponse = this.socketService.getVerifyOtpResponse().subscribe(async(data: unknown) => {
@@ -141,6 +138,9 @@ export class LoginComponent {
       if (responseData.success) {
         this.openRegistrationForm();
       }
+      else {
+        this.submissionErrorMsg = responseData.data.message;
+      }
     });
 
     this.loginResponse = this.socketService.getLoginResponse().subscribe(async (data) => {
@@ -148,6 +148,9 @@ export class LoginComponent {
       const userData = data as unknown as response;
       if (userData.success) {
         this.loginUser(userData);
+      }
+      else {
+        this.submissionErrorMsg = userData.data.message;
       }
     });
   }
@@ -195,6 +198,7 @@ export class LoginComponent {
   }
 
   toggleLoginForm() {
+    this.submissionErrorMsg = '';
     this.formType++;
   }
 
@@ -203,16 +207,10 @@ export class LoginComponent {
   }
 
   loginUser(data: response) {
-    // this.cookieServices.setCookie('userData', JSON.stringify(userData.data.data));
     const userData = data.data.data as unknown as user;
     this.loginservice.loginUser(userData);
     this.closeModal();
-    // this.loginUserEvent.emit();
   }
-
-  // testWebsocket() {
-  //   this.socketService.sendMessage('test', 'message');
-  // }
 
   sendOtp() {
     if (this.otpForm.valid) {
@@ -223,7 +221,6 @@ export class LoginComponent {
   validateOtp() {
     console.log(this.otpVerificationForm.value);
     if (this.otpVerificationForm.valid) {
-      // this.otpVerificationForm!.get('OTP')!.value;
       console.log(this.otpVerificationForm.getRawValue());
       this.socketService.sendMessage('EventValidateOTP', this.otpVerificationForm.getRawValue());
     }
@@ -262,12 +259,6 @@ export class LoginComponent {
     });
   }
 
-  // login = async (data: response) => {
-  //   this.cookieServices.setCookie('userData', JSON.stringify(data.data.data));
-  //   // this.closeModal();
-  //   window.location.reload();
-  // };
-
   openValidateOtpForm = async (responseData: response) => {
     const hashData: fullHash = responseData.data.data as unknown as fullHash;
     this.formType++;
@@ -280,11 +271,17 @@ export class LoginComponent {
   };
 
   openRegistrationForm = async () => {
+    this.submissionErrorMsg = '';
     this.formType++;
     console.log(this.otpVerificationForm.getRawValue().EMAILID);
     const emailId = this.otpVerificationForm.getRawValue().EMAILID;
     this.registrationForm.patchValue({
       EMAILID: emailId
     });
+  };
+
+  openPreviousForm = async() => {
+    this.formType--;
+    this.submissionErrorMsg = '';
   };
 }
