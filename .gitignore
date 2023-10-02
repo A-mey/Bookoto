@@ -1,2 +1,5 @@
 node_modules
 .angular/cache
+dist
+index.html
+.DS_Store
