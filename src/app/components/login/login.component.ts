@@ -122,14 +122,16 @@ export class LoginComponent {
     });
 
     this.sendOtpResponse = this.socketService.getSendOtpResponse().subscribe(async(data: unknown) => {
-      console.log(data);
-      const responseData =  data as unknown as response;
-      if (responseData.success) {
-        await this.openValidateOtpForm(responseData);
-      }
-      else {
-        this.submissionErrorMsg = responseData.data.message;
-      }
+      if (data) {
+        console.log(data);
+        const responseData =  data as unknown as response;
+        if (responseData.success) {
+          await this.openValidateOtpForm(responseData);
+        }
+        else {
+          this.submissionErrorMsg = responseData.data.message;
+        }
+      }      
     });
 
     this.verifyOtpResponse = this.socketService.getVerifyOtpResponse().subscribe(async(data: unknown) => {

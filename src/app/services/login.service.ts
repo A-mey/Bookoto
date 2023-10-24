@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { CookieServices } from './cookie.service';
 import { user } from '../types/user.type';
+import { SocketService } from './socket.service';
 
 @Injectable({
   providedIn: 'root'
@@ -8,7 +9,8 @@ import { user } from '../types/user.type';
 export class LoginService {
 
   constructor(
-    private cookieServices: CookieServices
+    private cookieServices: CookieServices,
+    private socketService: SocketService
   ) { }
 
   loginUser = async (userData: user) => {
@@ -36,4 +38,27 @@ export class LoginService {
     }
     return {isUserLoggedIn: isUserLoggedIn, userData: userData};
   };
+
+  manageSession = async () => {
+    const sessionId: string = await this.cookieServices.getCookie('SessionId');
+    if (sessionId) {
+      this.verifySessionId(sessionId);
+    } else {
+      this.getSessionId();
+    }
+  };
+
+  verifySessionId = async (sessionId: string) => {
+    const data = { SESSIONID: sessionId };
+    this.socketService.sendMessage('EventGetSessionId', data);
+  };
+
+  getSessionId = async () => {
+    this.socketService.sendMessage('EventVerifySessionId');
+  };
+
+  setSessionId = async (sessionId: string) => {
+    this.cookieServices.setCookie('SessionId', sessionId);
+  };
+
 }
