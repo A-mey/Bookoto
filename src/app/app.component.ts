@@ -31,6 +31,19 @@ export class AppComponent {
     }
   });
 
+  sessionIdVerification = this.socketService.getVerifySessionId().subscribe(async(data: unknown) => {
+    if (data) {
+      const responseData = data as unknown as response;
+      if (responseData.success) {
+        if (responseData.data.message !== 'Session is valid') {
+          const data = responseData.data.data as {SESSIONID: string};
+          const sessionId = data.SESSIONID;
+          await this.setAnonymousUser(sessionId);
+        }
+      }
+    }
+  });
+
   async ngOnInit() {
     await this.getSession();
   }
@@ -42,6 +55,4 @@ export class AppComponent {
   setAnonymousUser = async (sessionId: string) => {
     await this.loginService.setSessionId(sessionId);
   };
-
-  
 }

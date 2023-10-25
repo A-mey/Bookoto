@@ -74,6 +74,5 @@ export class SocketService {
       this.sessionId$.next(message);
     });
     return this.sessionId$.asObservable();
-  };
-  
+  };  
 }
