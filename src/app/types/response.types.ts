@@ -2,5 +2,5 @@
 export type response = {
     success: boolean,
     code: number,
-    data: {message: string, data?: unknown}
+    data: {message: string, data?: object}
 }

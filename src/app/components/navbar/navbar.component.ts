@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input, SimpleChanges } from '@angular/core';
 import { DataService } from '../../services/data.service';
 import { LoginService } from 'src/app/services/login.service';
 
@@ -8,30 +8,38 @@ import { LoginService } from 'src/app/services/login.service';
   styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent {
-  userName: string = '';
   loginState: boolean = false;
+
+  @Input() userData: { isLoggedIn: 0 | 1; userData: { firstName: string; lastName: string; }} | undefined;
+  userName: string | undefined;
 
   constructor(
     private dataservice: DataService,
     private loginService: LoginService) { }
 
   async ngOnInit() {
-    await this.checkLogin();
+    // this.loginState = this.userData?.isLoggedIn === 1? true: false;
+    // if (this.loginState) {
+    //   this.userName = this.userData?.userData.firstName;
+    // }
+  }
+
+  async ngOnChanges(changes: SimpleChanges) {
+    const isUserLoggedIn = changes['userData'];
+    if (isUserLoggedIn.currentValue) {
+      const userData = isUserLoggedIn.currentValue;
+      this.loginState = userData?.isLoggedIn === 1? true: false;
+      if (this.loginState) {
+        this.userName = userData?.userData.firstName;
+      }
+    }
   }
 
   openLoginForm() {
     this.dataservice.openForm();
   }
 
-  async checkLogin() {
-    const userDataCookie = await this.loginService.getUserData();
-    if (userDataCookie.isUserLoggedIn && userDataCookie.userData) {
-      this.loginState = true;
-      this.userName = userDataCookie.userData?.FIRSTNAME;
-    }
-  }
-
   logout() {
-    this.loginService.logoutUser();
+    // this.loginService.logoutUser();
   }
 }

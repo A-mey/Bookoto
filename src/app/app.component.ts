@@ -3,6 +3,7 @@ import { SocketService } from 'src/app/services/socket.service';
 import { LoginService } from './services/login.service';
 import { CookieServices } from './services/cookie.service';
 import { response } from './types/response.types';
+import { Subscription } from 'rxjs';
 
 
 @Component({
@@ -12,40 +13,54 @@ import { response } from './types/response.types';
 })
 export class AppComponent {
   title = 'Bookoto';
-  loginState: boolean = false;
   userName: string = '';
+  
+  private getSessionData: Subscription = new Subscription;
+  private getSessionId: Subscription = new Subscription;
+  firstName: string = '';
+  userData: { isLoggedIn: 0 | 1; userData: { firstName: string; lastName: string; }} | undefined;
 
   constructor(
     private socketService: SocketService,
     private loginService: LoginService,
     private cookieService: CookieServices) { }
 
-  getSessionId = this.socketService.getSessionIdResponse().subscribe(async(data: unknown) => {
-    if (data) {
-      const responseData = data as unknown as response;
-      if (responseData.success) {
-        const data = responseData.data.data as {SESSIONID: string};
-        const sessionId = data.SESSIONID;
-        await this.setAnonymousUser(sessionId);
-      }
-    }
-  });
+  async ngOnInit() {
+    await this.getSession();
 
-  sessionIdVerification = this.socketService.getVerifySessionId().subscribe(async(data: unknown) => {
-    if (data) {
-      const responseData = data as unknown as response;
-      if (responseData.success) {
-        if (responseData.data.message !== 'Session is valid') {
+    this.getSessionData = this.socketService.getVerifySessionId().subscribe(async(data: unknown) => {
+      if (data) {
+        const responseData = data as unknown as response;
+        if (responseData.success) {
+          const sessionResponse = responseData.data.data as {TYPE: 1|0, SESSIONID: string, SESSIONDATA: object} | null;
+          if (sessionResponse?.TYPE === 0) {
+            const sessionId = sessionResponse.SESSIONID;
+            await this.setAnonymousUser(sessionId);
+          } else if (sessionResponse?.TYPE === 1) {
+            const sessionData = sessionResponse.SESSIONDATA as {isLoggedIn: 0|1, userData: {firstName: string, lastName: string}};
+            if (sessionData.isLoggedIn === 1) {
+              this.userData = sessionData;
+            }
+          }
+        }
+      }
+    });
+
+    this.getSessionId = this.socketService.getSessionIdResponse().subscribe(async(data: unknown) => {
+      if (data) {
+        const responseData = data as unknown as response;
+        if (responseData.success) {
           const data = responseData.data.data as {SESSIONID: string};
           const sessionId = data.SESSIONID;
           await this.setAnonymousUser(sessionId);
         }
       }
-    }
-  });
+    });
+  }
 
-  async ngOnInit() {
-    await this.getSession();
+  async ngOnDestroy() {
+    this.getSessionData.unsubscribe();
+    this.getSessionId.unsubscribe();
   }
 
   getSession = async () => {
