@@ -10,7 +10,7 @@ import { LoginService } from 'src/app/services/login.service';
 export class NavbarComponent {
   loginState: boolean = false;
 
-  @Input() userData: { isLoggedIn: 0 | 1; userData: { firstName: string; lastName: string; }} | undefined;
+  @Input() userData: { ISLOGGEDIN: 0 | 1; FIRSTNAME: string} | undefined;
   userName: string | undefined;
 
   constructor(
@@ -28,9 +28,9 @@ export class NavbarComponent {
     const isUserLoggedIn = changes['userData'];
     if (isUserLoggedIn.currentValue) {
       const userData = isUserLoggedIn.currentValue;
-      this.loginState = userData?.isLoggedIn === 1? true: false;
+      this.loginState = userData?.ISLOGGEDIN === 1? true: false;
       if (this.loginState) {
-        this.userName = userData?.userData.firstName;
+        this.userName = userData?.FIRSTNAME;
       }
     }
   }

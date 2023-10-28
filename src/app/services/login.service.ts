@@ -13,8 +13,8 @@ export class LoginService {
     private socketService: SocketService
   ) { }
 
-  loginUser = async (userData: user) => {
-    this.cookieServices.setCookie('UserData', JSON.stringify(userData));
+  loginUser = async () => {
+    // this.cookieServices.setCookie('UserData', JSON.stringify(userData));
     // this.router.navigateByUrl('/');
     window.location.reload();
   };

@@ -18,7 +18,7 @@ export class AppComponent {
   private getSessionData: Subscription = new Subscription;
   private getSessionId: Subscription = new Subscription;
   firstName: string = '';
-  userData: { isLoggedIn: 0 | 1; userData: { firstName: string; lastName: string; }} | undefined;
+  userData: { ISLOGGEDIN: 0 | 1; FIRSTNAME: string } | undefined;
 
   constructor(
     private socketService: SocketService,
@@ -32,13 +32,13 @@ export class AppComponent {
       if (data) {
         const responseData = data as unknown as response;
         if (responseData.success) {
-          const sessionResponse = responseData.data.data as {TYPE: 1|0, SESSIONID: string, SESSIONDATA: object} | null;
+          const sessionResponse = responseData.data.data as {TYPE: 1|0, sessionId: string, sessionData: object} | null;
           if (sessionResponse?.TYPE === 0) {
-            const sessionId = sessionResponse.SESSIONID;
+            const sessionId = sessionResponse.sessionId;
             await this.setAnonymousUser(sessionId);
           } else if (sessionResponse?.TYPE === 1) {
-            const sessionData = sessionResponse.SESSIONDATA as {isLoggedIn: 0|1, userData: {firstName: string, lastName: string}};
-            if (sessionData.isLoggedIn === 1) {
+            const sessionData = sessionResponse.sessionData as {ISLOGGEDIN: 0|1, FIRSTNAME: string};
+            if (sessionData.ISLOGGEDIN === 1) {
               this.userData = sessionData;
             }
           }

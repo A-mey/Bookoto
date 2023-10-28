@@ -10,7 +10,7 @@ import { CookieServices } from 'src/app/services/cookie.service';
 import { fullHash } from 'src/app/types/fullHash.type';
 import { Router } from '@angular/router';
 import { LoginService } from '../../services/login.service';
-import { user } from 'src/app/types/user.type';
+// import { user } from 'src/app/types/user.type';
 // import { map, timer, takeWhile } from 'rxjs';
 
 @Component({
@@ -62,10 +62,13 @@ export class LoginComponent {
   public submissionErrorMsgString$ = Observable.create((observer: { next: (arg0: number) => void; }) => {
     observer.next(this.formType);
   });
+  sessionId: string = '';
 
   // public submissionErrorMsgString$ = new Subject();
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
+
+    this.sessionId = await this.cookieServices.getCookie('SessionId');
 
     this.submissionErrorMsgString$.subscribe(() => {
       this.submissionErrorMsg = '';
@@ -147,12 +150,14 @@ export class LoginComponent {
 
     this.loginResponse = this.socketService.getLoginResponse().subscribe(async (data) => {
       console.log(data);
-      const userData = data as unknown as response;
-      if (userData.success) {
-        this.loginUser(userData);
-      }
-      else {
-        this.submissionErrorMsg = userData.data.message;
+      if (data) {
+        const userData = data as unknown as response;
+        if (userData.success) {
+          this.loginUser(userData);
+        }
+        else {
+          this.submissionErrorMsg = userData.data.message;
+        }
       }
     });
   }
@@ -187,7 +192,8 @@ export class LoginComponent {
   submitLoginForm() {
     console.log(this.loginForm.value);
     if (this.loginForm.valid) {
-      this.socketService.sendMessage('EventLogin', (this.loginForm.value));
+      const loginData = {SESSIONID: this.sessionId, LOGINDATA: this.loginForm.value};
+      this.socketService.sendMessage('EventLogin', loginData);
     }
   }
 
@@ -209,8 +215,8 @@ export class LoginComponent {
   }
 
   loginUser(data: response) {
-    const userData = data.data.data as unknown as user;
-    this.loginservice.loginUser(userData);
+    // const userData = data.data.data as unknown as user;
+    this.loginservice.loginUser();
     this.closeModal();
   }
 
