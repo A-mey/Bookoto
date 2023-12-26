@@ -13,7 +13,7 @@ export class CookieServices {
     this.cookieService.set(key, value);
   };
 
-  getCookie = async(key: string): Promise<string> => {
+  getCookie = (key: string): string => {
     return this.cookieService.get(key);
   };
 

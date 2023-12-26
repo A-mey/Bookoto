@@ -2,17 +2,26 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { retry, catchError } from 'rxjs/operators';
+import { CookieServices } from './cookie.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class HttpServiceService {
+  sessionId: string = '';
+  token: string = '';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient,
+    private cookieServices: CookieServices) {
+        this.sessionId = this.cookieServices.getCookie('SESSION_ID');
+        this.token = this.cookieServices.getCookie('TOKEN');
+    }
 
   httpOptions = {
     headers: new HttpHeaders({
       'Content-Type': 'application/json',
+      'SESSION_ID': this.sessionId,
+      'TOKEN': this.token
     }),
   };
 
