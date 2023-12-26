@@ -10,6 +10,7 @@ import { CookieServices } from 'src/app/services/cookie.service';
 import { fullHash } from 'src/app/types/fullHash.type';
 import { Router } from '@angular/router';
 import { LoginService } from '../../services/login.service';
+import { HttpServiceService } from '../../services/http-service.service';
 // import { user } from 'src/app/types/user.type';
 // import { map, timer, takeWhile } from 'rxjs';
 
@@ -113,30 +114,6 @@ export class LoginComponent {
     const currentDate = new Date();
     this.maxDate = new Date(currentDate.setFullYear(currentDate.getFullYear() - this.allowedMinAge));
 
-    this.registrationResponse = this.socketService.getRegistrationResponse().subscribe(async(data: unknown) => {
-      console.log(data);
-      const responseData =  data as unknown as response;
-      if (responseData.success) {
-        this.formType = 1;
-      }
-      else {
-        this.submissionErrorMsg = responseData.data.message;
-      }
-    });
-
-    this.sendOtpResponse = this.socketService.getSendOtpResponse().subscribe(async(data: unknown) => {
-      if (data) {
-        console.log(data);
-        const responseData =  data as unknown as response;
-        if (responseData.success) {
-          await this.openValidateOtpForm(responseData);
-        }
-        else {
-          this.submissionErrorMsg = responseData.data.message;
-        }
-      }      
-    });
-
     this.verifyOtpResponse = this.socketService.getVerifyOtpResponse().subscribe(async(data: unknown) => {
       console.log(data);
       const responseData =  data as unknown as response;
@@ -145,19 +122,6 @@ export class LoginComponent {
       }
       else {
         this.submissionErrorMsg = responseData.data.message;
-      }
-    });
-
-    this.loginResponse = this.socketService.getLoginResponse().subscribe(async (data) => {
-      console.log(data);
-      if (data) {
-        const userData = data as unknown as response;
-        if (userData.success) {
-          this.loginUser(userData);
-        }
-        else {
-          this.submissionErrorMsg = userData.data.message;
-        }
       }
     });
   }
@@ -174,28 +138,30 @@ export class LoginComponent {
     private socketService: SocketService,
     private cookieServices: CookieServices,
     private router: Router,
-    private loginservice: LoginService) {
+    private loginservice: LoginService,
+    private httpService: HttpServiceService) {
       this.router.routeReuseStrategy.shouldReuseRoute = () => {
         return false;
       };
     }
 
-  submitRegistrationForm() {
-    console.log(this.registrationForm.value);
-    this.registrationForm.get('GENDER')?.setValue(parseInt(this.registrationForm.value.GENDER));
-    this.registrationForm.get('TITLE')?.setValue(parseInt(this.registrationForm.value.TITLE));
+  submitRegistrationForm = async () => {
+    await this.setRegistrationForm();
     if (this.registrationForm.valid) {
-      this.socketService.sendMessage('EventRegistration', this.registrationForm.getRawValue());
+      const registrationFormValue = this.registrationForm.getRawValue() as unknown as object;
+      const registrationResponse = await this.sendRegistrationRequest(registrationFormValue);
+      await this.processRegistration(registrationResponse);
     }
-  }
+  };
 
-  submitLoginForm() {
+  submitLoginForm = async () => {
     console.log(this.loginForm.value);
     if (this.loginForm.valid) {
-      const loginData = {SESSIONID: this.sessionId, LOGINDATA: this.loginForm.value};
-      this.socketService.sendMessage('EventLogin', loginData);
+      const loginFormValue = this.loginForm.value as unknown as object;
+      const loginResponse = await this.sendLoginRequest(loginFormValue);
+      await this.processLogin(loginResponse);
     }
-  }
+  };
 
   /* Conver date object to string */
   date(e: Date) {
@@ -214,17 +180,19 @@ export class LoginComponent {
     this.closeModalEvent.emit();
   }
 
-  loginUser(data: response) {
-    // const userData = data.data.data as unknown as user;
+  loginUser() {
     this.loginservice.loginUser();
     this.closeModal();
   }
 
-  sendOtp() {
+  sendOtp = async () => {
     if (this.otpForm.valid) {
       this.socketService.sendMessage('EventSendOTP', this.otpForm.value);
+      const otpFormValue = this.otpForm.value as unknown as object;
+      const otpResponse = await this.sendOtpRequest(otpFormValue);
+      await this.processOtp(otpResponse);
     }
-  }
+  };
 
   validateOtp() {
     console.log(this.otpVerificationForm.value);
@@ -291,5 +259,58 @@ export class LoginComponent {
   openPreviousForm = async() => {
     this.formType--;
     this.submissionErrorMsg = '';
+  };
+
+  sendRegistrationRequest = async (formValue: object) : Promise<response> => {
+    const url = '';
+    const data = this.httpService.postRequest(url, formValue);
+    const registrationResponseData =  data as unknown as response;
+    return registrationResponseData;
+  };
+
+  setRegistrationForm = async () => {
+    this.registrationForm.get('GENDER')?.setValue(parseInt(this.registrationForm.value.GENDER));
+    this.registrationForm.get('TITLE')?.setValue(parseInt(this.registrationForm.value.TITLE));
+  };
+
+  processRegistration = async (responseData: response) => {
+    if (responseData.success) {
+      this.formType = 1;
+    }
+    else {
+      this.submissionErrorMsg = responseData.data.message;
+    }
+  };
+
+  sendLoginRequest = async (formValue: object) => {
+    const url = '';
+    const loginResponse = this.httpService.postRequest(url, formValue);
+    const loginResponseData =  loginResponse as unknown as response;
+    return loginResponseData;
+  };
+
+  processLogin = async (loginData: response) => {
+    if (loginData.success) {
+      this.loginUser();
+    }
+    else {
+      this.submissionErrorMsg = loginData.data.message;
+    }
+  };
+
+  sendOtpRequest = async (otpData: object): Promise<response> => {
+    const url = '';
+    const data = this.httpService.postRequest(url, otpData);
+    const otpResponse =  data as unknown as response;
+    return otpResponse;
+  };
+
+  processOtpResponse = async (otpresponse: response) => {
+        if (otpresponse.success) {
+          await this.openValidateOtpForm(otpresponse);
+        }
+        else {
+          this.submissionErrorMsg = otpresponse.data.message;
+        }
   };
 }
