@@ -113,17 +113,6 @@ export class LoginComponent {
 
     const currentDate = new Date();
     this.maxDate = new Date(currentDate.setFullYear(currentDate.getFullYear() - this.allowedMinAge));
-
-    this.verifyOtpResponse = this.socketService.getVerifyOtpResponse().subscribe(async(data: unknown) => {
-      console.log(data);
-      const responseData =  data as unknown as response;
-      if (responseData.success) {
-        this.openRegistrationForm();
-      }
-      else {
-        this.submissionErrorMsg = responseData.data.message;
-      }
-    });
   }
 
   ngOnDestroy() {
@@ -187,20 +176,20 @@ export class LoginComponent {
 
   sendOtp = async () => {
     if (this.otpForm.valid) {
-      this.socketService.sendMessage('EventSendOTP', this.otpForm.value);
       const otpFormValue = this.otpForm.value as unknown as object;
       const otpResponse = await this.sendOtpRequest(otpFormValue);
       await this.processOtp(otpResponse);
     }
   };
 
-  validateOtp() {
+  validateOtp = async () => {
     console.log(this.otpVerificationForm.value);
     if (this.otpVerificationForm.valid) {
-      console.log(this.otpVerificationForm.getRawValue());
-      this.socketService.sendMessage('EventValidateOTP', this.otpVerificationForm.getRawValue());
+      const verifyOtpValue = this.otpVerificationForm.getRawValue() as unknown as object;
+      const verifyOtpResponse = await this.sendVerifyOtpRequest(verifyOtpValue);
+      await this.processVerifyOtp(verifyOtpResponse);
     }
-  }
+  };
 
   startTimer(otpSeconds: number) {
     this.timer$ = timer(0, 1000).pipe(
@@ -305,12 +294,28 @@ export class LoginComponent {
     return otpResponse;
   };
 
-  processOtpResponse = async (otpresponse: response) => {
-        if (otpresponse.success) {
-          await this.openValidateOtpForm(otpresponse);
-        }
-        else {
-          this.submissionErrorMsg = otpresponse.data.message;
-        }
+  processOtp = async (otpresponse: response) => {
+    if (otpresponse.success) {
+      await this.openValidateOtpForm(otpresponse);
+    }
+    else {
+      this.submissionErrorMsg = otpresponse.data.message;
+    }
+  };
+
+  sendVerifyOtpRequest = async (verifyOtp: object) => {
+    const url = '';
+    const data = this.httpService.postRequest(url, verifyOtp);
+    const verifyOtpResponse =  data as unknown as response;
+    return verifyOtpResponse;
+  };
+
+  processVerifyOtp = async (verifyOtpData: response) => {
+    if (verifyOtpData.success) {
+      this.openRegistrationForm();
+    }
+    else {
+      this.submissionErrorMsg = verifyOtpData.data.message;
+    }
   };
 }
