@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { CookieServices } from './cookie.service';
-import { user } from '../types/user.type';
+import { User } from '../types/user.type';
 import { SocketService } from './socket.service';
 
 @Injectable({
@@ -27,10 +27,10 @@ export class LoginService {
   getUserData = async () => {
     // const userLoginDetails = {isUserLoggedIn: false, userData: {}};
     let isUserLoggedIn = false;
-    let userData: user | undefined;
+    let userData: User | undefined;
     const userCookie: string = await this.cookieServices.getCookie('UserData');
     if (userCookie) {
-      const user: user = JSON.parse(userCookie);
+      const user: User = JSON.parse(userCookie);
       if (user) {
         isUserLoggedIn = true;
         userData = user;

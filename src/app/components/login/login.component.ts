@@ -5,9 +5,9 @@ import { ConfirmPasswordValidator } from 'src/app/common/confirm-password';
 import { LoginForm } from 'src/app/enums/login.enum';
 import { NgxOtpInputConfig } from 'ngx-otp-input';
 import { Observable, Subscription, scan, takeWhile, timer } from 'rxjs';
-import {response} from './../../types/response.types';
+import { Response } from './../../types/response.types';
 import { CookieServices } from 'src/app/services/cookie.service';
-import { fullHash } from 'src/app/types/fullHash.type';
+import { FullHash } from 'src/app/types/fullHash.type';
 import { Router } from '@angular/router';
 import { LoginService } from '../../services/login.service';
 import { HttpServiceService } from '../../services/http-service.service';
@@ -224,8 +224,8 @@ export class LoginComponent {
     });
   }
 
-  openValidateOtpForm = async (responseData: response) => {
-    const hashData: fullHash = responseData.data.data as unknown as fullHash;
+  openValidateOtpForm = async (responseData: Response) => {
+    const hashData: FullHash = responseData.data.data as unknown as FullHash;
     this.formType++;
     const otpSeconds = 120;
     this.startTimer(otpSeconds);
@@ -250,10 +250,10 @@ export class LoginComponent {
     this.submissionErrorMsg = '';
   };
 
-  sendRegistrationRequest = async (formValue: object) : Promise<response> => {
+  sendRegistrationRequest = async (formValue: object) : Promise<Response> => {
     const url = '';
     const data = this.httpService.postRequest(url, formValue);
-    const registrationResponseData =  data as unknown as response;
+    const registrationResponseData =  data as unknown as Response;
     return registrationResponseData;
   };
 
@@ -262,7 +262,7 @@ export class LoginComponent {
     this.registrationForm.get('TITLE')?.setValue(parseInt(this.registrationForm.value.TITLE));
   };
 
-  processRegistration = async (responseData: response) => {
+  processRegistration = async (responseData: Response) => {
     if (responseData.success) {
       this.formType = 1;
     }
@@ -274,11 +274,11 @@ export class LoginComponent {
   sendLoginRequest = async (formValue: object) => {
     const url = '';
     const loginResponse = this.httpService.postRequest(url, formValue);
-    const loginResponseData =  loginResponse as unknown as response;
+    const loginResponseData =  loginResponse as unknown as Response;
     return loginResponseData;
   };
 
-  processLogin = async (loginData: response) => {
+  processLogin = async (loginData: Response) => {
     if (loginData.success) {
       this.loginUser();
     }
@@ -287,14 +287,14 @@ export class LoginComponent {
     }
   };
 
-  sendOtpRequest = async (otpData: object): Promise<response> => {
+  sendOtpRequest = async (otpData: object): Promise<Response> => {
     const url = '';
     const data = this.httpService.postRequest(url, otpData);
-    const otpResponse =  data as unknown as response;
+    const otpResponse =  data as unknown as Response;
     return otpResponse;
   };
 
-  processOtp = async (otpresponse: response) => {
+  processOtp = async (otpresponse: Response) => {
     if (otpresponse.success) {
       await this.openValidateOtpForm(otpresponse);
     }
@@ -306,11 +306,11 @@ export class LoginComponent {
   sendVerifyOtpRequest = async (verifyOtp: object) => {
     const url = '';
     const data = this.httpService.postRequest(url, verifyOtp);
-    const verifyOtpResponse =  data as unknown as response;
+    const verifyOtpResponse =  data as unknown as Response;
     return verifyOtpResponse;
   };
 
-  processVerifyOtp = async (verifyOtpData: response) => {
+  processVerifyOtp = async (verifyOtpData: Response) => {
     if (verifyOtpData.success) {
       this.openRegistrationForm();
     }

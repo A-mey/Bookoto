@@ -1,3 +1,3 @@
-export type fullHash = {
+export type FullHash = {
     fullHash: string;
 }

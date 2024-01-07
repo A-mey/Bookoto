@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { SocketService } from 'src/app/services/socket.service';
 import { LoginService } from './services/login.service';
 import { CookieServices } from './services/cookie.service';
-import { response } from './types/response.types';
+import { Response } from './types/response.types';
 import { Subscription } from 'rxjs';
 
 
@@ -30,7 +30,7 @@ export class AppComponent {
 
     this.getSessionData = this.socketService.getVerifySessionId().subscribe(async(data: unknown) => {
       if (data) {
-        const responseData = data as unknown as response;
+        const responseData = data as unknown as Response;
         if (responseData.success) {
           const sessionResponse = responseData.data.data as {TYPE: 1|0, sessionId: string, sessionData: object} | null;
           if (sessionResponse?.TYPE === 0) {
@@ -48,7 +48,7 @@ export class AppComponent {
 
     this.getSessionId = this.socketService.getSessionIdResponse().subscribe(async(data: unknown) => {
       if (data) {
-        const responseData = data as unknown as response;
+        const responseData = data as unknown as Response;
         if (responseData.success) {
           const data = responseData.data.data as {SESSIONID: string};
           const sessionId = data.SESSIONID;

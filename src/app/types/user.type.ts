@@ -1,4 +1,4 @@
-export type user = {
+export type User = {
     ID: number,
     TITLE: number,
     FIRSTNAME: string,
