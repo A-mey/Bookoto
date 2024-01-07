@@ -1,0 +1,14 @@
+<div>
+    <mat-grid-list cols="3" rowHeight="2:1">
+        <div *ngFor="let product of productList">
+            <mat-grid-tile>
+                <div>
+                    <img src = {{product.volumeInfo.imageLinks.smallThumbnail}}>
+                </div>
+                <div>
+                    {{product.volumeInfo.title}}
+                </div>
+            </mat-grid-tile>
+        </div>
+    </mat-grid-list>
+</div>

@@ -26,11 +26,13 @@ import { NgOtpInputModule } from  'ng-otp-input';
 import { NgxOtpInputModule } from 'ngx-otp-input';
 import {MatMenuModule} from '@angular/material/menu';
 import {MatButtonModule} from '@angular/material/button';
+import {MatGridListModule} from '@angular/material/grid-list';
 
 import { ClickCursorDirective } from './directives/click.cursor.directive';
 import { CustomDisableDirective } from './directives/disable.directive';
 import { CountdownTimerComponent } from './components/countdown-timer/countdown-timer.component';
 import { TimePipe } from './pipes/time.pipe';
+import { ProductsComponent } from './components/products/products.component';
 
 
 
@@ -43,7 +45,8 @@ import { TimePipe } from './pipes/time.pipe';
     ClickCursorDirective,
     CustomDisableDirective,
     CountdownTimerComponent,
-    TimePipe    
+    TimePipe,
+    ProductsComponent    
   ],
   imports: [
     BrowserModule,
@@ -66,7 +69,8 @@ import { TimePipe } from './pipes/time.pipe';
     MatSelectModule,
     NgOtpInputModule,
     NgxOtpInputModule,
-    MatMenuModule
+    MatMenuModule,
+    MatGridListModule
   ],
   providers: [DataService],
   bootstrap: [AppComponent]
