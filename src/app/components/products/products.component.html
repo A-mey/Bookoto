@@ -1,14 +1,29 @@
-<div>
-    <mat-grid-list cols="3" rowHeight="2:1">
-        <div *ngFor="let product of productList">
-            <mat-grid-tile>
-                <div>
-                    <img src = {{product.volumeInfo.imageLinks.smallThumbnail}}>
-                </div>
-                <div>
-                    {{product.volumeInfo.title}}
-                </div>
-            </mat-grid-tile>
-        </div>
-    </mat-grid-list>
+<div class="container">
+    <div class="filter">
+        <ul>
+            <li>1</li>
+            <li>2</li>
+            <li>3</li>
+        </ul>
+    </div>
+    <div class="product-list">
+        <mat-grid-list cols="4" rowHeight="2:1">
+            <div class="product-item" *ngFor="let product of productList">
+                <mat-grid-tile>
+                    <div class="tile">
+                        <div class="title-image">
+                            <img src = {{product.volumeInfo.imageLinks.smallThumbnail}}>
+                        </div>
+                        <div class="title-name">
+                            {{product.volumeInfo.title}}
+                        </div>
+                        <div class="title-price">
+                            {{product.saleInfo.listPrice?.currencyCode}} {{product.saleInfo.listPrice?.amount}}
+                        </div>
+                    </div>
+                </mat-grid-tile>
+            </div>
+        </mat-grid-list>
+    </div>
+    
 </div>

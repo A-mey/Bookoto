@@ -1,0 +1,41 @@
+.tile {
+    display: flex;
+    flex-direction: column;
+    margin: 30px;
+}
+
+// .title-image {
+//     margin: 10px;
+// }
+
+// .title-price {
+//     margin: 10px;
+// }
+
+// .product{
+//     display: flex;
+//     flex-direction: row;
+// }
+
+.container {
+    display: flex;
+    max-width: 1200px;
+    // margin: 0 auto;
+    max-height: max-content;
+}
+
+.product-list {
+    flex: 3;
+    padding: 20px;
+    background-color: #ffffff;
+}
+
+.product-item {
+    // display: flex;
+    border-bottom: 1px solid #ddd;
+    padding: 10px;
+}
+
+.filter {
+    flex: 1;
+}
