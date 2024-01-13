@@ -4,6 +4,7 @@ import { SocketService } from 'src/app/services/socket.service';
 import { ConfirmPasswordValidator } from 'src/app/common/confirm-password';
 import { LoginForm } from 'src/app/enums/login.enum';
 import { NgxOtpInputConfig } from 'ngx-otp-input';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Observable, Subscription, scan, takeWhile, timer } from 'rxjs';
 import { Response } from './../../types/response.types';
 import { CookieServices } from 'src/app/services/cookie.service';
@@ -13,6 +14,7 @@ import { LoginService } from '../../services/login.service';
 import { HttpServiceService } from '../../services/http-service.service';
 // import { user } from 'src/app/types/user.type';
 // import { map, timer, takeWhile } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -54,10 +56,10 @@ export class LoginComponent {
 
   allowedMinAge: number = 13;
   fullHash!: string;  
-  registrationResponse!: Subscription;
-  sendOtpResponse!: Subscription;
-  verifyOtpResponse!: Subscription;
-  loginResponse!: Subscription;
+  // registrationResponse!: Subscription;
+  // sendOtpResponse!: Subscription;
+  // verifyOtpResponse!: Subscription;
+  // loginResponse!: Subscription;
   submissionErrorMsg: string = '';
 
   public submissionErrorMsgString$ = Observable.create((observer: { next: (arg0: number) => void; }) => {
@@ -116,10 +118,10 @@ export class LoginComponent {
   }
 
   ngOnDestroy() {
-    this.registrationResponse.unsubscribe();
-    this.verifyOtpResponse.unsubscribe();
-    this.sendOtpResponse.unsubscribe();
-    this.loginResponse.unsubscribe();
+    // this.registrationResponse.unsubscribe();
+    // this.verifyOtpResponse.unsubscribe();
+    // this.sendOtpResponse.unsubscribe();
+    // this.loginResponse.unsubscribe();
   }
 
   constructor(
@@ -251,7 +253,7 @@ export class LoginComponent {
   };
 
   sendRegistrationRequest = async (formValue: object) : Promise<Response> => {
-    const url = '';
+    const url = environment.sendRegistrationRequestUrl;
     const data = this.httpService.postRequest(url, formValue);
     const registrationResponseData =  data as unknown as Response;
     return registrationResponseData;
@@ -272,7 +274,7 @@ export class LoginComponent {
   };
 
   sendLoginRequest = async (formValue: object) => {
-    const url = '';
+    const url = environment.sendLoginRequestUrl;
     const loginResponse = this.httpService.postRequest(url, formValue);
     const loginResponseData =  loginResponse as unknown as Response;
     return loginResponseData;
@@ -288,7 +290,7 @@ export class LoginComponent {
   };
 
   sendOtpRequest = async (otpData: object): Promise<Response> => {
-    const url = '';
+    const url = environment.sendOtpRequest;
     const data = this.httpService.postRequest(url, otpData);
     const otpResponse =  data as unknown as Response;
     return otpResponse;
@@ -304,7 +306,7 @@ export class LoginComponent {
   };
 
   sendVerifyOtpRequest = async (verifyOtp: object) => {
-    const url = '';
+    const url = environment.sendVerifyOtpRequestUrl;
     const data = this.httpService.postRequest(url, verifyOtp);
     const verifyOtpResponse =  data as unknown as Response;
     return verifyOtpResponse;
