@@ -48,6 +48,7 @@ export class LoginComponent {
       inputError: 'my-super-error-class'
     }
   };
+  subscription: Subscription[] = [];
 
 
 
@@ -104,7 +105,6 @@ export class LoginComponent {
 
     this.otpForm = this.fb.group({
       EMAILID: ['', [Validators.required, Validators.pattern(emailRegex)]],
-      
     });
 
     this.otpVerificationForm = this.fb.group({
@@ -179,8 +179,7 @@ export class LoginComponent {
   sendOtp = async () => {
     if (this.otpForm.valid) {
       const otpFormValue = this.otpForm.value as unknown as object;
-      const otpResponse = await this.sendOtpRequest(otpFormValue);
-      await this.processOtp(otpResponse);
+      await this.sendOtpRequest(otpFormValue);
     }
   };
 
@@ -289,16 +288,20 @@ export class LoginComponent {
     }
   };
 
-  sendOtpRequest = async (otpData: object): Promise<Response> => {
+  sendOtpRequest = async (otpData: object): Promise<void> => {
     const url = environment.sendOtpRequest;
-    const data = this.httpService.postRequest(url, otpData);
-    const otpResponse =  data as unknown as Response;
-    return otpResponse;
+    // const data = await this.httpService.postRequest(url, otpData);
+    this.subscription.push((this.httpService.postRequest(url, otpData)).subscribe((response: unknown) => {
+      const otpResponse =  response as unknown as Response;
+      alert(JSON.stringify(otpResponse));
+      this.processOtp(otpResponse);
+    })
+    );
   };
 
-  processOtp = async (otpresponse: Response) => {
+  processOtp = (otpresponse: Response) => {
     if (otpresponse.success) {
-      await this.openValidateOtpForm(otpresponse);
+      this.openValidateOtpForm(otpresponse);
     }
     else {
       this.submissionErrorMsg = otpresponse.data.message;

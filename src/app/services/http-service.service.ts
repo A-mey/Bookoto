@@ -20,8 +20,8 @@ export class HttpServiceService {
   httpOptions = {
     headers: new HttpHeaders({
       'Content-Type': 'application/json',
-      'SESSION_ID': this.sessionId,
-      'TOKEN': this.token
+    //   'SESSION_ID': this.sessionId,
+    //   'TOKEN': this.token
     }),
   };
 
@@ -31,7 +31,7 @@ export class HttpServiceService {
       .pipe(retry(1), catchError(this.handleError));
   }
 
-  postRequest(url: string, data: object): Observable<unknown> {
+  postRequest = (url: string, data: object): Observable<unknown> => {
     return this.http
       .post<unknown>(
         url,
@@ -39,7 +39,7 @@ export class HttpServiceService {
         this.httpOptions
         )
         .pipe(retry(1), catchError(this.handleError));
-  }
+  };
 
   // Error handling
   handleError(error: {error: ErrorEvent, status: unknown, message: string}) {

@@ -49,12 +49,12 @@ export class LoginService {
   };
 
   verifySessionId = async (sessionId: string) => {
-    const data = { SESSIONID: sessionId };
-    this.socketService.sendMessage('EventVerifySessionId', data);
+    // const data = { SESSIONID: sessionId };
+    // this.socketService.sendMessage('EventVerifySessionId', data);
   };
   
   getSessionId = async () => {
-    this.socketService.sendMessage('EventGetSessionId');
+    // this.socketService.sendMessage('EventGetSessionId');
   };
 
   setSessionId = async (sessionId: string) => {

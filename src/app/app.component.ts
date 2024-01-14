@@ -28,34 +28,34 @@ export class AppComponent {
   async ngOnInit() {
     await this.getSession();
 
-    this.getSessionData = this.socketService.getVerifySessionId().subscribe(async(data: unknown) => {
-      if (data) {
-        const responseData = data as unknown as Response;
-        if (responseData.success) {
-          const sessionResponse = responseData.data.data as {TYPE: 1|0, sessionId: string, sessionData: object} | null;
-          if (sessionResponse?.TYPE === 0) {
-            const sessionId = sessionResponse.sessionId;
-            await this.setAnonymousUser(sessionId);
-          } else if (sessionResponse?.TYPE === 1) {
-            const sessionData = sessionResponse.sessionData as {ISLOGGEDIN: 0|1, FIRSTNAME: string};
-            if (sessionData.ISLOGGEDIN === 1) {
-              this.userData = sessionData;
-            }
-          }
-        }
-      }
-    });
+    // this.getSessionData = this.socketService.getVerifySessionId().subscribe(async(data: unknown) => {
+    //   if (data) {
+    //     const responseData = data as unknown as Response;
+    //     if (responseData.success) {
+    //       const sessionResponse = responseData.data.data as {TYPE: 1|0, sessionId: string, sessionData: object} | null;
+    //       if (sessionResponse?.TYPE === 0) {
+    //         const sessionId = sessionResponse.sessionId;
+    //         await this.setAnonymousUser(sessionId);
+    //       } else if (sessionResponse?.TYPE === 1) {
+    //         const sessionData = sessionResponse.sessionData as {ISLOGGEDIN: 0|1, FIRSTNAME: string};
+    //         if (sessionData.ISLOGGEDIN === 1) {
+    //           this.userData = sessionData;
+    //         }
+    //       }
+    //     }
+    //   }
+    // });
 
-    this.getSessionId = this.socketService.getSessionIdResponse().subscribe(async(data: unknown) => {
-      if (data) {
-        const responseData = data as unknown as Response;
-        if (responseData.success) {
-          const data = responseData.data.data as {SESSIONID: string};
-          const sessionId = data.SESSIONID;
-          await this.setAnonymousUser(sessionId);
-        }
-      }
-    });
+    // this.getSessionId = this.socketService.getSessionIdResponse().subscribe(async(data: unknown) => {
+    //   if (data) {
+    //     const responseData = data as unknown as Response;
+    //     if (responseData.success) {
+    //       const data = responseData.data.data as {SESSIONID: string};
+    //       const sessionId = data.SESSIONID;
+    //       await this.setAnonymousUser(sessionId);
+    //     }
+    //   }
+    // });
   }
 
   async ngOnDestroy() {
