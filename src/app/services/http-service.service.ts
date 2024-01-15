@@ -7,7 +7,7 @@ import { CookieServices } from './cookie.service';
 @Injectable({
   providedIn: 'root'
 })
-export class HttpServiceService {
+export class HttpService {
   sessionId: string = '';
   token: string = '';
 

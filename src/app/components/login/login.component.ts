@@ -11,7 +11,7 @@ import { CookieServices } from 'src/app/services/cookie.service';
 import { FullHash } from 'src/app/types/fullHash.type';
 import { Router } from '@angular/router';
 import { LoginService } from '../../services/login.service';
-import { HttpServiceService } from '../../services/http-service.service';
+import { HttpService } from '../../services/http-service.service';
 // import { user } from 'src/app/types/user.type';
 // import { map, timer, takeWhile } from 'rxjs';
 import { environment } from '../../../environments/environment';
@@ -130,7 +130,7 @@ export class LoginComponent {
     private cookieServices: CookieServices,
     private router: Router,
     private loginservice: LoginService,
-    private httpService: HttpServiceService) {
+    private httpService: HttpService) {
       this.router.routeReuseStrategy.shouldReuseRoute = () => {
         return false;
       };
