@@ -6,6 +6,8 @@ import { Response } from './types/response.types';
 import { Subscription } from 'rxjs';
 import { HttpService } from './services/http-service.service';
 import { environment } from 'src/environments/environment';
+import { Startup } from './types/startup.type';
+import { Product } from './types/product.type';
 
 
 @Component({
@@ -22,6 +24,7 @@ export class AppComponent {
   firstName: string = '';
   userData: { ISLOGGEDIN: 0 | 1; FIRSTNAME: string } | undefined;
   subscription: Subscription[] = [];
+  products: Product[] = [];
 
   constructor(
     private socketService: SocketService,
@@ -30,37 +33,7 @@ export class AppComponent {
     private httpService: HttpService) { }
 
   async ngOnInit() {
-    await this.startup();
-    // await this.getSession();
-
-    // this.getSessionData = this.socketService.getVerifySessionId().subscribe(async(data: unknown) => {
-    //   if (data) {
-    //     const responseData = data as unknown as Response;
-    //     if (responseData.success) {
-    //       const sessionResponse = responseData.data.data as {TYPE: 1|0, sessionId: string, sessionData: object} | null;
-    //       if (sessionResponse?.TYPE === 0) {
-    //         const sessionId = sessionResponse.sessionId;
-    //         await this.setAnonymousUser(sessionId);
-    //       } else if (sessionResponse?.TYPE === 1) {
-    //         const sessionData = sessionResponse.sessionData as {ISLOGGEDIN: 0|1, FIRSTNAME: string};
-    //         if (sessionData.ISLOGGEDIN === 1) {
-    //           this.userData = sessionData;
-    //         }
-    //       }
-    //     }
-    //   }
-    // });
-
-    // this.getSessionId = this.socketService.getSessionIdResponse().subscribe(async(data: unknown) => {
-    //   if (data) {
-    //     const responseData = data as unknown as Response;
-    //     if (responseData.success) {
-    //       const data = responseData.data.data as {SESSIONID: string};
-    //       const sessionId = data.SESSIONID;
-    //       await this.setAnonymousUser(sessionId);
-    //     }
-    //   }
-    // });
+    await this.startupRequest();
   }
 
   async ngOnDestroy() {
@@ -76,13 +49,23 @@ export class AppComponent {
     await this.loginService.setSessionId(sessionId);
   };
 
-  startup = async () => {
+  startupRequest = async () => {
     try {
       const url = environment.startupUrl;
       this.subscription.push(this.httpService.getRequest(url).subscribe(async (response: unknown) => {
         const startupResponse =  response as unknown as Response;
         console.log('startupResponse', startupResponse);
+        const startupData = startupResponse.data.data as unknown as Startup;
+        await this.manageStartup(startupData);
       }));
+    } catch (error: unknown) {
+      console.log(error);
+    }
+  };
+
+  manageStartup = async (startupResponse: Startup) => {
+    try {
+      this.products = startupResponse.PRODUCTS;
     } catch (error: unknown) {
       console.log(error);
     }

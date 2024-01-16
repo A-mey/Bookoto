@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { retry, catchError } from 'rxjs/operators';
 import { CookieServices } from './cookie.service';
@@ -10,6 +10,7 @@ import { CookieServices } from './cookie.service';
 export class HttpService {
   sessionId: string = '';
   token: string = '';
+  options: {withCredentials: boolean} = { withCredentials: true };
 
   constructor(private http: HttpClient,
     private cookieServices: CookieServices) {
@@ -17,18 +18,19 @@ export class HttpService {
         // this.token = this.cookieServices.getCookie('TOKEN') || '';
     }
 
-  // httpOptions = {
-  //   headers: new HttpHeaders({
-  //     'Content-Type': 'application/json',
-  //     'SESSION_ID': this.sessionId,
-  //   //   'TOKEN': this.token
-  //   }),
-  // };
+  httpOptions = {
+    headers: new HttpHeaders({
+      'Content-Type': 'application/json',
+      // 'SESSION_ID': this.sessionId,
+    //   'TOKEN': this.token
+    }),
+  };
 
   getRequest = (url: string): Observable<unknown> => {
     return this.http
       .get<unknown>(
-        url)
+        url,
+        this.options)
       .pipe(retry(1), catchError(this.handleError));
   };
 
