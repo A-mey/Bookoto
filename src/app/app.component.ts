@@ -4,6 +4,8 @@ import { LoginService } from './services/login.service';
 import { CookieServices } from './services/cookie.service';
 import { Response } from './types/response.types';
 import { Subscription } from 'rxjs';
+import { HttpService } from './services/http-service.service';
+import { environment } from 'src/environments/environment';
 
 
 @Component({
@@ -19,14 +21,16 @@ export class AppComponent {
   private getSessionId: Subscription = new Subscription;
   firstName: string = '';
   userData: { ISLOGGEDIN: 0 | 1; FIRSTNAME: string } | undefined;
+  subscription: Subscription[] = [];
 
   constructor(
     private socketService: SocketService,
     private loginService: LoginService,
-    private cookieService: CookieServices) { }
+    private cookieService: CookieServices,
+    private httpService: HttpService) { }
 
   async ngOnInit() {
-    await this.getSession();
+    // await this.getSession();
 
     // this.getSessionData = this.socketService.getVerifySessionId().subscribe(async(data: unknown) => {
     //   if (data) {
@@ -69,5 +73,17 @@ export class AppComponent {
 
   setAnonymousUser = async (sessionId: string) => {
     await this.loginService.setSessionId(sessionId);
+  };
+
+  startup = async () => {
+    try {
+      const sessionId = await this.loginService.getSessionId() || '';
+      const url = environment.sendLoginRequestUrl;
+      this.subscription.push(this.httpService.getRequest(url).subscribe(async (response: unknown) => {
+        const startupResponse =  response as unknown as Response;
+      }));
+    } catch (error: unknown) {
+      console.log(error);
+    }
   };
 }

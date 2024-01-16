@@ -54,7 +54,7 @@ export class LoginService {
   };
   
   getSessionId = async () => {
-    // this.socketService.sendMessage('EventGetSessionId');
+    return await this.cookieServices.getCookie('SessionId');
   };
 
   setSessionId = async (sessionId: string) => {

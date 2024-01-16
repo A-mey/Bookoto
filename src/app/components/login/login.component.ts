@@ -11,7 +11,7 @@ import { CookieServices } from 'src/app/services/cookie.service';
 import { FullHash } from 'src/app/types/fullHash.type';
 import { Router } from '@angular/router';
 import { LoginService } from '../../services/login.service';
-import { HttpServiceService } from '../../services/http-service.service';
+import { HttpService } from '../../services/http-service.service';
 // import { user } from 'src/app/types/user.type';
 // import { map, timer, takeWhile } from 'rxjs';
 import { environment } from '../../../environments/environment';
@@ -130,7 +130,7 @@ export class LoginComponent {
     private cookieServices: CookieServices,
     private router: Router,
     private loginservice: LoginService,
-    private httpService: HttpServiceService) {
+    private httpService: HttpService) {
       this.router.routeReuseStrategy.shouldReuseRoute = () => {
         return false;
       };
@@ -140,8 +140,7 @@ export class LoginComponent {
     await this.setRegistrationForm();
     if (this.registrationForm.valid) {
       const registrationFormValue = this.registrationForm.getRawValue() as unknown as object;
-      const registrationResponse = await this.sendRegistrationRequest(registrationFormValue);
-      await this.processRegistration(registrationResponse);
+      await this.sendRegistrationRequest(registrationFormValue);
     }
   };
 
@@ -149,8 +148,7 @@ export class LoginComponent {
     console.log(this.loginForm.value);
     if (this.loginForm.valid) {
       const loginFormValue = this.loginForm.value as unknown as object;
-      const loginResponse = await this.sendLoginRequest(loginFormValue);
-      await this.processLogin(loginResponse);
+      await this.sendLoginRequest(loginFormValue);
     }
   };
 
@@ -187,8 +185,7 @@ export class LoginComponent {
     console.log(this.otpVerificationForm.value);
     if (this.otpVerificationForm.valid) {
       const verifyOtpValue = this.otpVerificationForm.getRawValue() as unknown as object;
-      const verifyOtpResponse = await this.sendVerifyOtpRequest(verifyOtpValue);
-      await this.processVerifyOtp(verifyOtpResponse);
+      await this.sendVerifyOtpRequest(verifyOtpValue);
     }
   };
 
@@ -251,11 +248,12 @@ export class LoginComponent {
     this.submissionErrorMsg = '';
   };
 
-  sendRegistrationRequest = async (formValue: object) : Promise<Response> => {
+  sendRegistrationRequest = async (formValue: object) : Promise<void> => {
     const url = environment.sendRegistrationRequestUrl;
-    const data = this.httpService.postRequest(url, formValue);
-    const registrationResponseData =  data as unknown as Response;
-    return registrationResponseData;
+    this.subscription.push((this.httpService.postRequest(url, formValue)).subscribe(async (response: unknown) => {
+      const registrationResponseData =  response as unknown as Response;
+      await this.processRegistration(registrationResponseData);
+    }));
   };
 
   setRegistrationForm = async () => {
@@ -274,9 +272,10 @@ export class LoginComponent {
 
   sendLoginRequest = async (formValue: object) => {
     const url = environment.sendLoginRequestUrl;
-    const loginResponse = this.httpService.postRequest(url, formValue);
-    const loginResponseData =  loginResponse as unknown as Response;
-    return loginResponseData;
+    this.subscription.push((this.httpService.postRequest(url, formValue)).subscribe(async (response: unknown) => {
+      const loginResponseData =  response as unknown as Response;
+      await this.processLogin(loginResponseData);
+    }));
   };
 
   processLogin = async (loginData: Response) => {
@@ -290,16 +289,13 @@ export class LoginComponent {
 
   sendOtpRequest = async (otpData: object): Promise<void> => {
     const url = environment.sendOtpRequest;
-    // const data = await this.httpService.postRequest(url, otpData);
-    this.subscription.push((this.httpService.postRequest(url, otpData)).subscribe((response: unknown) => {
+    this.subscription.push((this.httpService.postRequest(url, otpData)).subscribe(async (response: unknown) => {
       const otpResponse =  response as unknown as Response;
-      alert(JSON.stringify(otpResponse));
-      this.processOtp(otpResponse);
-    })
-    );
+      await this.processOtp(otpResponse);
+    }));
   };
 
-  processOtp = (otpresponse: Response) => {
+  processOtp = async (otpresponse: Response) => {
     if (otpresponse.success) {
       this.openValidateOtpForm(otpresponse);
     }
@@ -310,9 +306,10 @@ export class LoginComponent {
 
   sendVerifyOtpRequest = async (verifyOtp: object) => {
     const url = environment.sendVerifyOtpRequestUrl;
-    const data = this.httpService.postRequest(url, verifyOtp);
-    const verifyOtpResponse =  data as unknown as Response;
-    return verifyOtpResponse;
+    this.subscription.push((this.httpService.postRequest(url, verifyOtp)).subscribe(async (response: unknown) => {
+      const verifyOtpResponse =  response as unknown as Response;
+      await this.processVerifyOtp(verifyOtpResponse);
+    }));
   };
 
   processVerifyOtp = async (verifyOtpData: Response) => {
