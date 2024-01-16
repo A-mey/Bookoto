@@ -30,6 +30,7 @@ export class AppComponent {
     private httpService: HttpService) { }
 
   async ngOnInit() {
+    await this.startup();
     // await this.getSession();
 
     // this.getSessionData = this.socketService.getVerifySessionId().subscribe(async(data: unknown) => {
@@ -77,10 +78,10 @@ export class AppComponent {
 
   startup = async () => {
     try {
-      const sessionId = await this.loginService.getSessionId() || '';
-      const url = environment.sendLoginRequestUrl;
+      const url = environment.startupUrl;
       this.subscription.push(this.httpService.getRequest(url).subscribe(async (response: unknown) => {
         const startupResponse =  response as unknown as Response;
+        console.log('startupResponse', startupResponse);
       }));
     } catch (error: unknown) {
       console.log(error);
