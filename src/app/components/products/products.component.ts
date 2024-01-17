@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, SimpleChanges } from '@angular/core';
 import { Product } from 'src/app/types/product.type';
 
 @Component({
@@ -9,5 +9,10 @@ import { Product } from 'src/app/types/product.type';
 export class ProductsComponent {
 
   @Input() products: Product[] = [];
+
+  ngOnChanges(changes: SimpleChanges) {
+    console.log('changes', changes);
+    this.products = changes['products'].currentValue;
+  }
   
 }

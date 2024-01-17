@@ -12,13 +12,17 @@
                 <mat-grid-tile>
                     <div class="tile">
                         <div class="title-image">
-                            <img src = {{product.volumeInfo.imageLinks.smallThumbnail}}>
+                            <img *ngIf = "product?.volumeInfo?.imageLinks?.smallThumbnail" src = {{product.volumeInfo.imageLinks.smallThumbnail}}>
+                            <img *ngIf = "!product?.volumeInfo?.imageLinks?.smallThumbnail" src = "../../../assets/catalog-default-img.gif">
                         </div>
                         <div class="title-name">
                             {{product.volumeInfo.title}}
                         </div>
-                        <div class="title-price">
+                        <div *ngIf="product?.saleInfo?.saleability === 'FOR_SALE'" class="title-price">
                             {{product.saleInfo.listPrice?.currencyCode}} {{product.saleInfo.listPrice?.amount}}
+                        </div>
+                        <div *ngIf="product?.saleInfo?.saleability === 'NOT_FOR_SALE'" class="title-price">
+                            NOT FOR SALE
                         </div>
                     </div>
                 </mat-grid-tile>

@@ -36,13 +36,15 @@ type VolumeInfo = {
 
 type SaleInfo = {
     country: string;
-    saleability: string;
+    saleability: Saleability;
     isEbook: boolean;
     listPrice?: Price;
     retailPrice?: Price;
     buyLink?: string;
     offers?: Offers[];
 }
+
+type Saleability = 'FOR_SALE' | 'NOT_FOR_SALE';
 
 type AccessInfo = {
     country: string;
