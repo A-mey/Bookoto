@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { DataService } from 'src/app/services/data.service';
 import { SocketService } from 'src/app/services/socket.service';
 import { CookieServices } from 'src/app/services/cookie.service';
+import { Product } from '../../types/product.type';
 // import { response } from 'src/app/types/response.types';
 
 @Component({
@@ -11,7 +12,21 @@ import { CookieServices } from 'src/app/services/cookie.service';
 })
 export class HomeComponent {
   modalState: string = 'CLOSED';
-  constructor(private dataservice: DataService, private socketService: SocketService, private cookieServices: CookieServices) { }
+
+  @Input() products: Product[] = [];
+  // get products(): Product[] { return this._products; }
+  // set products(products: Product[]) {
+  //   this._products = products;
+  // }
+  // private _products: Product[] = [];
+
+
+  constructor(
+    private dataservice: DataService,
+    private socketService: SocketService,
+    private cookieServices: CookieServices
+    ) { }
+
   ngOnInit() {
 
     this.dataservice.name.subscribe(data  =>{
@@ -22,14 +37,6 @@ export class HomeComponent {
         this.modalState = 'CLOSED';
       }
     });
-
-    // this.socketService.getLoginResponse().subscribe(async (data) => {
-    //   console.log(data);
-    //   const userData = data as unknown as response;
-    //   if (userData.success) {
-    //     this.cookieServices.setCookie('userData', JSON.stringify(userData.data.data));
-    //   }
-    // });
   }
 
   closeModal() {
