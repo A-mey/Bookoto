@@ -8,10 +8,10 @@ import { HttpClientModule } from '@angular/common/http';
 import { HomeComponent } from './components/home/home.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import {MatToolbarModule} from '@angular/material/toolbar';
-import {MatIconModule} from '@angular/material/icon';
-import {MatCardModule} from '@angular/material/card';
-import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { DataService } from './services/data.service';
 import { LoginComponent } from './components/login/login.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -33,8 +33,8 @@ import { CustomDisableDirective } from './directives/disable.directive';
 import { CountdownTimerComponent } from './components/countdown-timer/countdown-timer.component';
 import { TimePipe } from './pipes/time.pipe';
 import { ProductsComponent } from './components/products/products.component';
-
-
+import { provideRouter } from '@angular/router';
+import { routes } from './app-routing.module';
 
 @NgModule({
   declarations: [
@@ -72,7 +72,8 @@ import { ProductsComponent } from './components/products/products.component';
     MatMenuModule,
     MatGridListModule
   ],
-  providers: [DataService],
+  providers: [DataService,
+    provideRouter(routes)],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
