@@ -9,7 +9,6 @@ import { environment } from 'src/environments/environment';
 import { Startup } from './types/startup.type';
 import { Product } from './types/product.type';
 
-
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',

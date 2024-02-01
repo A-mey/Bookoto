@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
-import { AppRoutingModule } from './app-routing.module';
+import { AppRoutingModule, routes } from './app-routing.module';
 import { AppComponent } from './app.component';
 
 import { HttpClientModule } from '@angular/common/http';
@@ -34,7 +34,6 @@ import { CountdownTimerComponent } from './components/countdown-timer/countdown-
 import { TimePipe } from './pipes/time.pipe';
 import { ProductsComponent } from './components/products/products.component';
 import { provideRouter } from '@angular/router';
-import { routes } from './app-routing.module';
 
 @NgModule({
   declarations: [
